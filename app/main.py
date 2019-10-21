@@ -5,7 +5,7 @@ import os
 import sys
 import traceback
 
-directory = os.path.split(os.path.abspath(sys.argv[0]))[0]
+directory = os.path.dirname(__file__)
 
 try:
 
@@ -47,7 +47,10 @@ def main():
                 pass
 
         text_error = traceback.format_exc()
-        traceback.print_exc(file=open(os.path.join(directory, 'error.log'), 'w'))
+
+        with open(os.path.join(directory, 'error.log'), 'w') as fd:
+            traceback.print_exc(file=fd)
+
         create_error_monitor()
 
 
