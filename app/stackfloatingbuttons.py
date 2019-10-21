@@ -116,9 +116,6 @@ Builder.load_string(
     FloatingButton:
         id: f_btn_2
         icon: list(root.floating_data.values())[1]
-    # FloatingButton:
-    #     id: f_btn_3
-    #     icon: list(root.floating_data.values())[2]
 
     MDFloatingLabel:
         id: f_lbl_1
@@ -128,10 +125,6 @@ Builder.load_string(
         id: f_lbl_2
         text: list(root.floating_data.keys())[1]
         y: dp(170)
-    # MDFloatingLabel:
-    #     id: f_lbl_3
-    #     text: list(root.floating_data.keys())[2]
-    #     y: dp(226)
 
     MDFloatingActionButton:
         icon: root.icon
@@ -148,6 +141,9 @@ Builder.load_string(
 class MDFloatingLabel(MDCard):
     text = StringProperty()
     text_color = ListProperty([0, 0, 0, 1])
+
+    def on_md_bg_color(self, instance, value):
+        self.md_bg_color = self.theme_cls.accent_light
 
 
 class MDStackFloatingButtons(FloatLayout):
