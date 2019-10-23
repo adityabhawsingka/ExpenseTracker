@@ -1,6 +1,9 @@
-# Entry point to the application. Runs the main extrac.py program code.
-# In case of error, displays a window with its text.
+"""
+This is entry point to the application. Runs the main extrac.py program code.
+In case of error, displays a window with its text.
+"""
 
+# imports
 import os
 import sys
 import traceback
@@ -14,8 +17,9 @@ try:
     Config.set('kivy', 'log_enable', 0)
 
 except Exception:
-    traceback.print_exc(file=open(os.path.join(directory, 'error.log'), 'w'))
-    print(traceback.print_exc())
+
+    with open(os.path.join(directory, 'error.log'), 'w') as fd:
+        traceback.print_exc(file=fd)
     sys.exit(1)
 
 
@@ -27,6 +31,7 @@ def main():
         app = EXTrac()
         app.run()
     except Exception:
+        # In case of exception display error to user
         from kivy.app import App
         from kivy.uix.boxlayout import BoxLayout
 

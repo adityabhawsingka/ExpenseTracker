@@ -1,5 +1,4 @@
 from kivy.app import App
-from kivy.lang import Builder
 from kivy.properties import ObjectProperty, DictProperty
 from kivy.uix.screenmanager import ScreenManager
 
@@ -21,13 +20,20 @@ class EXTrac(App):
         return sm
 
     def build_config(self, config):
+        """Set default settings for the application
+            Currency   : currency symbol to be used
+            Mode       : Whether Dark or Light mode
+            DayLimitFlg: Enable or disable app theme color change on breach of
+                         daily spend limit.
+            DayLimitAmt: Daily spend limit
+        """
         config.setdefaults('CustSettings', {'Currency': '₹',
                                             'Mode': 'Light',
                                             'DayLimitFlg': False,
                                             'DayLimitAmt': 0})
 
     def on_start(self):
-        Builder.load_string(startupscreen)
+        """On Application start show the startup screen"""
         ss = StartupScreen()
         self.root.add_widget(ss)
         self.root.current = 'StartupScreen'

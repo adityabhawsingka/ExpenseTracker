@@ -1,6 +1,12 @@
+"""
+ StartupScreen:
+ =============
+ This is just a buffer screen before displaying the dashbord
+"""
+
 from kivy.uix.screenmanager import Screen
-from kivy.properties import ObjectProperty
 from kivy.app import App
+from kivy.lang import Builder
 
 startupscreen = '''
 <StartupScreen>
@@ -24,9 +30,11 @@ startupscreen = '''
 
 
 class StartupScreen(Screen):
+    """This screen acts as a buffer before displaying the dashbord"""
+
+    Builder.load_string(startupscreen)
 
     def __init__(self):
-        self.name = 'StartupScreen'
         super(StartupScreen, self).__init__()
 
     def on_enter(self, *args):
@@ -37,6 +45,7 @@ class StartupScreen(Screen):
     def load_navigation():
         from navigation import NavigationScreen
 
+        """Set the app theme settings"""
         from kivymd.theming import ThemeManager
         app = App.get_running_app()
         app.theme_cls = ThemeManager()
