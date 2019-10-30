@@ -1,10 +1,13 @@
-from kivy.uix.screenmanager import Screen
-from kivy.properties import ObjectProperty
 from datetime import date
-from kivymd.cards import MDCard
-from kivy.uix.behaviors import ButtonBehavior
+
 from kivy.animation import Animation
+from kivy.properties import ObjectProperty
+from kivy.uix.behaviors import ButtonBehavior
+from kivy.uix.screenmanager import Screen
+from kivy.app import App
+
 from dtclasses import Expenses, Items
+from kivymd.cards import MDCard
 
 
 class CardButton(ButtonBehavior, MDCard):
@@ -12,28 +15,31 @@ class CardButton(ButtonBehavior, MDCard):
     fixed_pos = (0, 0)
 
     def __init__(self, **kwargs):
+        self.app = App.get_running_app()
         super(CardButton, self).__init__(**kwargs)
 
     def on_press(self):
-        self.fade_bg = Animation(duration=.25,
-                                 md_bg_color=app_scr.theme_cls.accent_color,
-                                 size_hint_x=self.fixed_size[0] - .1,
-                                 pos_hint={'x': self.fixed_pos[0] + 0.05, 'y': self.fixed_pos[1]})
+        self.fade_bg = Animation(
+            duration=0.25,
+            md_bg_color=self.theme_cls.accent_color,
+            size_hint_x=self.fixed_size[0] - 0.1,
+            pos_hint={"x": self.fixed_pos[0] + 0.05, "y": self.fixed_pos[1]},
+        )
         self.fade_bg.start(self)
-
-        # self.fade_bg = Animation(duration=.5, md_bg_color=current_bg_color)
-        # self.fade_bg.start(self)
 
     def on_release(self):
         self.fade_bg.stop(self)
-        self.fade_bg = Animation(duration=.25, md_bg_color=app_scr.theme_cls.bg_light,
-                                 size_hint_x=self.fixed_size[0],
-                                 pos_hint={'x': self.fixed_pos[0], 'y': self.fixed_pos[1]})
+        self.fade_bg = Animation(
+            duration=0.25,
+            md_bg_color=self.theme_cls.bg_light,
+            size_hint_x=self.fixed_size[0],
+            pos_hint={"x": self.fixed_pos[0], "y": self.fixed_pos[1]},
+        )
         self.fade_bg.start(self)
-        app_scr.screens.show_screen('Expenses')
+        self.app.screens.show_screen("Expenses")
 
 
-dashboard = '''
+dashboard = """
 #:import MDFlatButton kivymd.button.MDFlatButton
 #:import MDLabel kivymd.label.MDLabel
 
@@ -220,7 +226,7 @@ dashboard = '''
                 elevation_normal: 10
                 on_release: root.add_expense()          
 
-'''
+"""
 
 
 class Dashboard(Screen):
@@ -228,33 +234,31 @@ class Dashboard(Screen):
     current_date = date.today()
 
     def __init__(self, **kwargs):
-        global app_scr
-        app_scr = kwargs['app']
-        self.name = 'Dashboard'
+        self.app = App.get_running_app()
+        self.name = "Dashboard"
         super(Dashboard, self).__init__()
-        self.ids.lbl_day_date.text = self.current_date.strftime('%d %b %Y')
-        self.ids.lbl_month_date.text = self.current_date.strftime('%b %Y')
-        self.ids.lbl_year_date.text = self.current_date.strftime('%Y')
+        self.ids.lbl_day_date.text = self.current_date.strftime("%d %b %Y")
+        self.ids.lbl_month_date.text = self.current_date.strftime("%b %Y")
+        self.ids.lbl_year_date.text = self.current_date.strftime("%Y")
         Items.data_correction()
 
     def on_enter(self, *args):
         self.update_totals()
 
     def update_totals(self):
-        currency = app_scr.config.get('CustSettings', 'Currency')
+        currency = self.app.config.get("CustSettings", "Currency")
         totals = Expenses.get_totals(self.current_date)
-        self.ids.lbl_day_total.text = '{} {}'.format(currency, str(totals['day']))
-        self.ids.lbl_month_total.text = '{} {}'.format(currency, str(totals['month']))
-        self.ids.lbl_year_total.text = '{} {}'.format(currency, str(totals['year']))
+        self.ids.lbl_day_total.text = "{} {}".format(currency, str(totals["day"]))
+        self.ids.lbl_month_total.text = "{} {}".format(currency, str(totals["month"]))
+        self.ids.lbl_year_total.text = "{} {}".format(currency, str(totals["year"]))
 
-        day_limit = float(app_scr.config.get('CustSettings', 'DayLimitAmt'))
-        day_limit_flg = app_scr.config.get('CustSettings', 'DayLimitFlg')
-        if totals['day'] > day_limit and day_limit_flg == 'True':
-            app_scr.theme_cls.primary_palette = 'Red'
+        day_limit = float(self.app.config.get("CustSettings", "DayLimitAmt"))
+        day_limit_flg = self.app.config.get("CustSettings", "DayLimitFlg")
+        if totals["day"] > day_limit and day_limit_flg == "True":
+            self.app.theme_cls.primary_palette = "Red"
         else:
-            app_scr.theme_cls.primary_palette = 'Teal'
+            self.app.theme_cls.primary_palette = "Teal"
 
     def add_expense(self):
-        app_scr.date = self.current_date.strftime('%Y-%m-%d')
-        app_scr.screens.show_screen('Add Expense')
-
+        self.app.date = self.current_date.strftime("%Y-%m-%d")
+        self.app.screens.show_screen("Add Expense")
