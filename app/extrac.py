@@ -1,6 +1,7 @@
 from kivy.app import App
 from kivy.properties import ObjectProperty, DictProperty
 from kivy.uix.screenmanager import ScreenManager
+from kivy.core.window import Window
 
 from startupscreen import StartupScreen
 
@@ -24,8 +25,15 @@ class EXTrac(App):
 
             loadingscreen.hide_loading_screen()
         self.use_kivy_settings = False
+        Window.bind(on_keyboard=self.key_input)
         sm = ScreenManager()
         return sm
+
+    def key_input(self, window, key, scancode, codepoint, modifier):
+        if key == 27:
+            return True  # override the default behaviour
+        else:  # the key now does nothing
+            return False
 
     def build_config(self, config):
         """Set default settings for the application
