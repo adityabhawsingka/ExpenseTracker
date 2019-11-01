@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from kivy.uix.screenmanager import Screen
 from kivy.uix.dropdown import DropDown
+from kivy.app import App
 
 from kivymd.pickers import MDDatePicker
 
@@ -105,18 +106,19 @@ class AddExpense(Screen):
     cat_dropdown = DropDown()
 
     def __init__(self, **kwargs):
-        self.name = 'Add Expense'
-        global app_scr
-        app_scr = kwargs.pop('app')
-        super(AddExpense, self).__init__(**kwargs)
-        self.cat_dropdown.bind(on_select=lambda instance, x: setattr(self.item_name, 'text', x))
+        self.name = "Add Expense"
+        self.app = App.get_running_app()
+        super(AddExpense, self).__init__()
+        self.cat_dropdown.bind(
+            on_select=lambda instance, x: setattr(self.item_name, "text", x)
+        )
         self.cat_dropdown.width = self.item_name.width
 
     def show_date_picker(self):
         MDDatePicker(self.pick_date).open()
 
     def pick_date(self, exp_date):
-        self.lbl_message.text = ''
+        self.lbl_message.text = ""
         self.datelabel.text = str(exp_date)
         self.expense_date = exp_date
 
@@ -125,74 +127,86 @@ class AddExpense(Screen):
         value = self.value.text
         exp_date = self.datelabel.text
 
-        if item_name is None or item_name == '' or \
-                value is None or value == '' or \
-                exp_date is None or exp_date == '':
-            self.lbl_message.text = 'Required input missing.'
-            self.lbl_message.theme_text_color = 'Error'
+        if (
+            item_name is None
+            or item_name == ""
+            or value is None
+            or value == ""
+            or exp_date is None
+            or exp_date == ""
+        ):
+            self.lbl_message.text = "Required input missing."
+            self.lbl_message.theme_text_color = "Error"
             return
 
         item_id = Items.get_item(item_name=item_name, item_link=None)
         if item_id is None or item_id == 0:
-            self.lbl_message.text = 'No Category/Sub-Category by this name. ' \
-                                    'Please create if required from Items screen.'
-            self.lbl_message.theme_text_color = 'Error'
+            self.lbl_message.text = (
+                "No Category/Sub-Category by this name. "
+                "Please create if required from Items screen."
+            )
+            self.lbl_message.theme_text_color = "Error"
             return
 
-        if value == '0':
-            self.lbl_message.text = 'Enter an amount not equal to 0'
-            self.lbl_message.theme_text_color = 'Error'
+        if value == "0":
+            self.lbl_message.text = "Enter an amount not equal to 0"
+            self.lbl_message.theme_text_color = "Error"
             return
 
         expense_id = Expenses.get_next_exp_id()
 
-        kwargs = {'expense_id': expense_id,
-                  'item_id': item_id,
-                  'value': float(value),
-                  'date': exp_date}
+        kwargs = {
+            "expense_id": expense_id,
+            "item_id": item_id,
+            "value": float(value),
+            "date": exp_date,
+        }
 
         Expenses.add_expense(**kwargs)
 
-        toast('Expense Added')
+        toast("Expense Added")
         self.leave_screen()
 
     def on_enter(self, *args):
-        self.expense_date = datetime.strptime(app_scr.date, '%Y-%m-%d')
-        self.datelabel.text = app_scr.date
-        self.item_name.text = ''
-        self.value.text = ''
+        self.expense_date = datetime.strptime(self.app.date, "%Y-%m-%d")
+        self.datelabel.text = self.app.date
+        self.item_name.text = ""
+        self.value.text = ""
         self.item_name.focus = True
-        self.lbl_message.text = ''
+        self.lbl_message.text = ""
 
     def left_arrow(self):
         self.expense_date = self.expense_date - timedelta(days=1)
-        self.datelabel.text = self.expense_date.strftime('%Y-%m-%d')
-        self.lbl_message.text = ''
+        self.datelabel.text = self.expense_date.strftime("%Y-%m-%d")
+        self.lbl_message.text = ""
 
     def right_arrow(self):
         self.expense_date = self.expense_date + timedelta(days=1)
-        self.datelabel.text = self.expense_date.strftime('%Y-%m-%d')
-        self.lbl_message.text = ''
+        self.datelabel.text = self.expense_date.strftime("%Y-%m-%d")
+        self.lbl_message.text = ""
 
     def get_category(self, *args):
         """function to get items based on the search text entered by user"""
         self.cat_dropdown.clear_widgets()
-        self.lbl_message.text = ''
+        self.lbl_message.text = ""
         if self.cat_dropdown.attach_to is not None:
             self.cat_dropdown._real_dismiss()
         item_name = self.item_name.text
         item_dict = {}
-        if item_name is not None and item_name != '' and args[0] != 'button':
-            item_dict = Items.get_items(item_name=item_name, item_type='all')
-        if args[0] == 'button':
-            item_dict = Items.get_items(item_name='', item_type='all')
+        if item_name is not None and item_name != "" and args[0] != "button":
+            item_dict = Items.get_items(item_name=item_name, item_type="all")
+        if args[0] == "button":
+            item_dict = Items.get_items(item_name="", item_type="all")
         if item_dict != {}:
             for key, value in item_dict.items():
-                self.cat_dropdown.add_widget(CustomFlatButton(text=value['item_name'],
-                                                              on_release=lambda x:
-                                                              self.cat_dropdown.select(x.text),
-                                                              md_bg_color=app_scr.theme_cls.accent_light,
-                                                              width=self.item_name.width))
+                self.cat_dropdown.add_widget(
+                    CustomFlatButton(
+                        text=value["item_name"],
+                        on_release=lambda x: self.cat_dropdown.select(x.text),
+                        md_bg_color=self.app.theme_cls.accent_light,
+                        width=self.item_name.width,
+                    )
+                )
 
             self.cat_dropdown.open(self.item_name)
 
@@ -203,7 +217,7 @@ class AddExpense(Screen):
             return
 
     def leave_screen(self, *args):
-        app_scr.screens.show_screen('Expenses')
+        self.app.screens.show_screen("Expenses")
 
     def on_leave(self, *args):
         self.cat_dropdown.clear_widgets()
