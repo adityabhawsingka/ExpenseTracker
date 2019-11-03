@@ -7,3 +7,9 @@ This is an Android app developed using Python, Kivy and KivyMD. Users will be ab
 You can dowload the app from Google Play Store at:
 
 https://play.google.com/store/apps/details?id=org.abhawsingka.extrac
+
+
+Contributing
+------------
+
+You are welcome to improve and suggest changes to this application.
